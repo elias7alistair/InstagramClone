@@ -5,7 +5,8 @@ import { db, auth } from "./firebase";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import { Button, Input } from "@material-ui/core";
-import ImageUpload from './components/ImageUpload'
+import ImageUpload from "./components/ImageUpload";
+
 
 // 2 10 20
 function getModalStyle() {
@@ -47,33 +48,29 @@ function App() {
     auth
       .createUserWithEmailAndPassword(email, password)
       .then((authUser) => {
-        authUser.user.updateProfile({
+        console.log(authUser)
+        return authUser.user.updateProfile({
           displayName: username,
         });
       })
       .catch((error) => alert(error.message));
-      setOpen(false)
+     
+    setOpen(false);
   };
 
   const signIn = (event) => {
     event.preventDefault();
-    auth.signInWithEmailAndPassword(email,password)
-    .catch((error) => alert(error.message));
-    setOpenSignIn(false)
-  }
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => alert(error.message));
+    setOpenSignIn(false);
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         console.log(authUser);
         setUser(authUser);
-
-        if (authUser.displayName) {
-        } else {
-          return authUser.updateProfile({
-            displayName: username,
-          });
-        }
       } else {
         setUser(null);
       }
@@ -85,27 +82,23 @@ function App() {
   }, [user, username]);
 
   useEffect(() => {
-    db.collection("posts").onSnapshot((snapshot) => {
-      setPosts(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          post: doc.data(),
-        }))
-      );
-    });
+    db.collection("posts")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        setPosts(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            post: doc.data(),
+          }))
+        );
+      });
   }, []);
 
+  {
+    console.log(username);
+  }
   return (
     <div className="app">
-      {console.log(user)}
-      {user?.displayName ? (
-        
-        <ImageUpload username={username}/>
-      ) : (
-
-        <h3>Sorry you need to login</h3>
-      )}
-
       <Modal
         open={open}
         onClose={() => {
@@ -123,13 +116,13 @@ function App() {
             </center>
             <Input
               placeholder="username"
-              type="username"
+              type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
             <Input
               placeholder="email"
-              type="text"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -147,7 +140,7 @@ function App() {
       <Modal
         open={openSignIn}
         onClose={() => {
-          setOpenSignIn(false)
+          setOpenSignIn(false);
         }}
       >
         <div style={modalStyle} className={classes.paper}>
@@ -159,7 +152,7 @@ function App() {
                 className="app__headerImage"
               />
             </center>
-        
+
             <Input
               placeholder="email"
               type="text"
@@ -178,12 +171,13 @@ function App() {
       </Modal>
       <div className="app__header">
         <img
+        className="app__headerImage"
           alt="Instagram"
           src="https://www.instagram.com/static/images/web/mobile_nav_type_logo-2x.png/1b47f9d0e595.png"
         />
-      </div>
 
-      {user ? (
+
+{user ? (
         <Button
           onClick={() => {
             auth.signOut();
@@ -195,7 +189,7 @@ function App() {
         <div className="app__loginContainer">
           <Button
             onClick={() => {
-              setOpenSignIn(true)
+              setOpenSignIn(true);
             }}
           >
             Sign In
@@ -210,17 +204,31 @@ function App() {
         </div>
       )}
 
-      <h1>hello instagram - alistair</h1>
-      {posts.map(({ post, id }) => {
+
+      </div>
+
+     <div className="app__posts">
+     {posts.map(({ post, id }) => {
         return (
           <Post
             key={id}
+            user={user}
+            postId = {id}
             imageUrl={post.imageUrl}
             username={post.username}
             caption={post.caption}
           />
         );
       })}
+     </div>
+    
+
+    
+      {user?.displayName ? (
+        <ImageUpload username={user.displayName} />
+      ) : (
+        <h3>Sorry you need to login</h3>
+      )}
     </div>
   );
 }

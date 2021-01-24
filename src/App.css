@@ -7,14 +7,38 @@
 }
 
 .app__header {
+  position: sticky;
+  top: 0;
   background-color: white;
   padding: 20px;
   border-bottom: 1px solid lightgray;
   object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 122;
 }
+
+.app__headerImage {
+  object-fit: contain;
+  height: 29px;
+}
+
 .app__signup{
   
   display: flex;
   flex-direction: column;
 
+}
+
+.app__posts{
+  display: flex;
+    justify-content: center;
+  padding:20px;
+}
+
+@media (max-width: 767px){
+  .app__posts{
+    padding:20px 2px;
+  }
 }
