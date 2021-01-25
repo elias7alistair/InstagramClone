@@ -1,6 +1,11 @@
 import firebase from "firebase";
+import dotenv from "dotenv";
+
+dotenv.config();
+const API_KEY =  process.env.REACT_APP_API_KEY;
+
 const firebaseApp = firebase.initializeApp({
-  apiKey: "AIzaSyCq_hoaZ2hawTNE76ASDv0DBle-_UF0KrI",
+  apiKey: API_KEY,
   authDomain: "instagram-clone-d2352.firebaseapp.com",
   projectId: "instagram-clone-d2352",
   storageBucket: "instagram-clone-d2352.appspot.com",
